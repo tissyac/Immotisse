@@ -10,10 +10,10 @@ const User = require('../models/User');
 // GET toutes les offres approuvées (public) - avec pagination et filtres avancés
 router.get('/', async (req, res) => {
   try {
-    const filters = { status: 'approved', isPublished: true };
+    const filters = { status: 'approved', isPublished: true, mainCategory: { $in: ['promotion', 'vente'] } };
     
     // Filtres catégories
-    if (req.query.mainCategory) filters.mainCategory = req.query.mainCategory;
+    if (req.query.mainCategory && ['promotion', 'vente'].includes(req.query.mainCategory)) filters.mainCategory = req.query.mainCategory;
     if (req.query.subCategory) filters.subCategory = req.query.subCategory;
     
     // Filtres localisation
@@ -87,14 +87,13 @@ router.get('/', async (req, res) => {
 router.get('/stats', async (req, res) => {
   try {
     const byCategoryArray = await Offer.aggregate([
-      { $match: { status: 'approved', isPublished: true } },
+      { $match: { status: 'approved', isPublished: true, mainCategory: { $in: ['promotion', 'vente'] } } },
       { $group: { _id: '$mainCategory', count: { $sum: 1 } } }
     ]);
 
     const counts = {
       promotion: 0,
-      vente: 0,
-      location: 0
+      vente: 0
     };
 
     byCategoryArray.forEach((item) => {
@@ -111,7 +110,7 @@ router.get('/stats', async (req, res) => {
 // GET données légères pour la page d'accueil : counts et 6 offres récentes
 router.get('/home', async (req, res) => {
   try {
-    const filter = { status: 'approved', isPublished: true };
+    const filter = { status: 'approved', isPublished: true, mainCategory: { $in: ['promotion', 'vente'] } };
 
     const countsPromise = Offer.aggregate([
       { $match: filter },
@@ -128,8 +127,7 @@ router.get('/home', async (req, res) => {
 
     const counts = {
       promotion: 0,
-      vente: 0,
-      location: 0
+      vente: 0
     };
 
     countsArray.forEach((item) => {
@@ -146,9 +144,9 @@ router.get('/home', async (req, res) => {
 // GET toutes les offres (admin) - avec pagination et filtres
 router.get('/admin/all', adminMiddleware, async (req, res) => {
   try {
-    const filters = {};
+    const filters = { mainCategory: { $in: ['promotion', 'vente'] } };
     if (req.query.status) filters.status = req.query.status;
-    if (req.query.mainCategory) filters.mainCategory = req.query.mainCategory;
+    if (req.query.mainCategory && ['promotion', 'vente'].includes(req.query.mainCategory)) filters.mainCategory = req.query.mainCategory;
     if (req.query.user) filters.user = req.query.user;
     
     const page = parseInt(req.query.page) || 1;
@@ -183,12 +181,14 @@ router.get('/admin/all', adminMiddleware, async (req, res) => {
 // GET : statistiques simples (admin)
 router.get('/admin/stats/overview', adminMiddleware, async (req, res) => {
   try {
-    const totalOffers = await Offer.countDocuments();
-    const approvedOffers = await Offer.countDocuments({ status: 'approved' });
-    const pendingOffers = await Offer.countDocuments({ status: 'pending' });
-    const rejectedOffers = await Offer.countDocuments({ status: 'rejected' });
+    const offerScope = { mainCategory: { $in: ['promotion', 'vente'] } };
+    const totalOffers = await Offer.countDocuments(offerScope);
+    const approvedOffers = await Offer.countDocuments({ ...offerScope, status: 'approved' });
+    const pendingOffers = await Offer.countDocuments({ ...offerScope, status: 'pending' });
+    const rejectedOffers = await Offer.countDocuments({ ...offerScope, status: 'rejected' });
     
     const byCategoryArray = await Offer.aggregate([
+      { $match: offerScope },
       { $group: { _id: '$mainCategory', count: { $sum: 1 } } }
     ]);
     
@@ -218,12 +218,12 @@ router.get('/user/:userId', authMiddleware, async (req, res) => {
     const skip = (page - 1) * limit;
     
     const [offers, total] = await Promise.all([
-      Offer.find({ user: req.params.userId })
+      Offer.find({ user: req.params.userId, mainCategory: { $in: ['promotion', 'vente'] } })
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
         .lean(),
-      Offer.countDocuments({ user: req.params.userId })
+      Offer.countDocuments({ user: req.params.userId, mainCategory: { $in: ['promotion', 'vente'] } })
     ]);
     
     res.json({
@@ -256,6 +256,10 @@ router.get('/:id', async (req, res) => {
 // POST : créer une offre (status pending ou brouillon, authentification requise)
 router.post('/', authMiddleware, async (req, res) => {
   try {
+    if (!['promotion', 'vente'].includes(req.body.mainCategory)) {
+      return res.status(400).json({ message: 'La location n’est plus proposée par ce centre immobilier.' });
+    }
+
     const isDraft = Boolean(req.body.isDraft);
     const changeable = req.body.changeable === true || req.body.changeable === 'true';
     const viabilise = req.body.viabilise === true || req.body.viabilise === 'true';
@@ -300,6 +304,9 @@ router.post('/', authMiddleware, async (req, res) => {
 router.put('/:id', authMiddleware, async (req, res) => {
   try {
     const updates = { ...req.body };
+    if (updates.mainCategory && !['promotion', 'vente'].includes(updates.mainCategory)) {
+      return res.status(400).json({ message: 'La location n’est plus proposée par ce centre immobilier.' });
+    }
     updates.changeable = req.body.changeable === true || req.body.changeable === 'true';
     updates.viabilise = req.body.viabilise === true || req.body.viabilise === 'true';
 

@@ -1,14 +1,9 @@
 const mongoose = require('mongoose');
 
-const availabilitySchema = new mongoose.Schema({
-  startDate: Date,
-  endDate: Date,
-}, { _id: false });
-
 const offerSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  mainCategory: { type: String, enum: ['promotion', 'vente', 'location'], required: true },
-  subCategory: { type: String, enum: ['maison', 'terrain', 'locaux_commerciaux', 'courte_duree', 'longue_duree', ''], default: '' },
+  mainCategory: { type: String, enum: ['promotion', 'vente'], required: true },
+  subCategory: { type: String, enum: ['maison', 'terrain', 'locaux_commerciaux', ''], default: '' },
   title: { type: String, required: true },
   description: String,
   address: String,
@@ -32,12 +27,8 @@ const offerSchema = new mongoose.Schema({
   viabilise: Boolean, // Pour terrain
   changeable: Boolean, // Pour terrain - possibilité d'échange
   facadeCount: Number, // Pour locaux commerciaux
-  furnished: Boolean, // Pour location longue durée (meublé ou non)
-  advance: String, // Pour location longue durée (avances)
-  equipment: [String], // Pour location courte durée
   images: [String],
   videos: [String],
-  availabilityCalendar: [availabilitySchema], // Pour location courte durée
   status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
   isPublished: { type: Boolean, default: false },
   isDraft: { type: Boolean, default: false },

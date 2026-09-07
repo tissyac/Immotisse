@@ -25,7 +25,6 @@ function OfferCard({ offer }) {
         <div className="offer-category-badge">
           {offer.mainCategory === 'promotion' && '🏗️ Promotion'}
           {offer.mainCategory === 'vente' && '🏠 Vente'}
-          {offer.mainCategory === 'location' && '🏢 Location'}
         </div>
       </div>
 
@@ -55,9 +54,8 @@ function OfferCard({ offer }) {
         ) : (
           <div className="offer-details">
             <div className="offer-info">
-              {/* Affichage simplifié pour les maisons, locaux commerciaux et location longue durée */}
-              {((offer.mainCategory === 'vente' && (offer.subCategory === 'maison' || offer.subCategory === 'locaux_commerciaux')) ||
-                (offer.mainCategory === 'location' && offer.subCategory === 'longue_duree')) ? (
+              {/* Affichage simplifié pour les maisons et locaux commerciaux */}
+              {offer.mainCategory === 'vente' && (offer.subCategory === 'maison' || offer.subCategory === 'locaux_commerciaux') ? (
                 <>
                   {offer.description && (
                     <div className="info-item">
@@ -87,12 +85,6 @@ function OfferCard({ offer }) {
                     </div>
                   )}
 
-                  {offer.mainCategory === 'location' && offer.subCategory === 'longue_duree' && offer.advance && (
-                    <div className="info-item">
-                      <span className="info-label">Avances:</span>
-                      <span className="info-value">{offer.advance}</span>
-                    </div>
-                  )}
                 </>
               ) : (
                 <>

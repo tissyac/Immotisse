@@ -1,14 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import ClientMessageForm from '../components/ClientMessageForm';
-import CalendarGrid from '../components/CalendarGrid';
-import '../calendar-styles.css';
 import './OfferDetails.css';
 
 const categoryLabels = {
   promotion: '🏗️ Promotion',
-  vente: '🏠 Vente Particulier',
-  location: '🏢 Location'
+  vente: '🏠 Vente Particulier'
 };
 
 function OfferDetails() {
@@ -119,21 +116,6 @@ function OfferDetails() {
   const nextVideo = () => {
     if (videoItems.length === 0) return;
     setCurrentVideoIndex((prev) => (prev === videoItems.length - 1 ? 0 : prev + 1));
-  };
-
-  const renderAvailabilityCalendar = () => {
-    const reservedPeriods = offer.availabilityCalendar || [];
-
-    return (
-      <div className="availability-calendar">
-        <h3>📅 Calendrier des disponibilités</h3>
-        <p className="availability-info">Les dates en rouge sont réservées, les autres sont disponibles.</p>
-        <CalendarGrid
-          reservedPeriods={reservedPeriods}
-          readOnly={true}
-        />
-      </div>
-    );
   };
 
   const renderCharacteristics = () => {
@@ -285,89 +267,6 @@ function OfferDetails() {
       }
     }
 
-    // Pour les autres catégories (promotion, location), utiliser les champs par défaut
-    if (offer.mainCategory === 'location') {
-      if (offer.subCategory === 'courte_duree') {
-        return (
-          <div className="details-stack">
-            {offer.propertyType && (
-              <div className="detail-card">
-                <div className="detail-card-icon">🏠</div>
-                <div>
-                  <div className="detail-card-label">Type de bien</div>
-                  <div className="detail-card-value">{offer.propertyType}</div>
-                </div>
-              </div>
-            )}
-
-            {offer.price && (
-              <div className="detail-card">
-                <div className="detail-card-icon">💰</div>
-                <div>
-                  <div className="detail-card-label">Prix</div>
-                  <div className="detail-card-value">{offer.price} {offer.currency || 'FCFA'}</div>
-                </div>
-              </div>
-            )}
-
-            {offer.area && (
-              <div className="detail-card">
-                <div className="detail-card-icon">📐</div>
-                <div>
-                  <div className="detail-card-label">Superficie</div>
-                  <div className="detail-card-value">{offer.area} m²</div>
-                </div>
-              </div>
-            )}
-
-            {offer.equipment && offer.equipment.length > 0 && (
-              <div className="detail-card">
-                <div className="detail-card-icon">🛋️</div>
-                <div>
-                  <div className="detail-card-label">Équipements</div>
-                  <div className="detail-card-value" style={{ whiteSpace: 'pre-wrap' }}>{Array.isArray(offer.equipment) ? offer.equipment.join('\n') : offer.equipment}</div>
-                </div>
-              </div>
-            )}
-          </div>
-        );
-      } else if (offer.subCategory === 'longue_duree') {
-        return (
-          <div className="details-stack">
-            {offer.description && (
-              <div className="detail-card">
-                <div className="detail-card-icon">📝</div>
-                <div>
-                  <div className="detail-card-label">Description</div>
-                  <div className="detail-card-value" style={{ whiteSpace: 'pre-wrap' }}>{offer.description}</div>
-                </div>
-              </div>
-            )}
-
-            {offer.propertyType && (
-              <div className="detail-card">
-                <div className="detail-card-icon">🏠</div>
-                <div>
-                  <div className="detail-card-label">Type de bien</div>
-                  <div className="detail-card-value" style={{ whiteSpace: 'pre-wrap' }}>{offer.propertyType}</div>
-                </div>
-              </div>
-            )}
-
-            {offer.advance && (
-              <div className="detail-card">
-                <div className="detail-card-icon">💰</div>
-                <div>
-                  <div className="detail-card-label">Avances demandées</div>
-                  <div className="detail-card-value" style={{ whiteSpace: 'pre-wrap' }}>{offer.advance}</div>
-                </div>
-              </div>
-            )}
-          </div>
-        );
-      }
-    }
-
     // Section pour les promotions - même champs que le formulaire de création
     if (offer.mainCategory === 'promotion') {
       return (
@@ -430,7 +329,7 @@ function OfferDetails() {
       );
     }
 
-    // Section pour les locations et autres structures non couvertes
+    // Section pour les autres structures non couvertes
     return (
       <div className="char-grid">
         {offer.address && (
@@ -834,7 +733,7 @@ function OfferDetails() {
             </section>
           ) : (
             <>
-              {offer.description && offer.subCategory !== 'longue_duree' && (
+              {offer.description && (
                 <section className="section description-section">
                   <h2>📝 Description</h2>
                   <p className="description-text" style={{ whiteSpace: 'pre-line' }}>{offer.description}</p>
@@ -846,7 +745,6 @@ function OfferDetails() {
                 {renderCharacteristics()}
               </section>
 
-              {offer.mainCategory === 'location' && offer.subCategory === 'courte_duree' && renderAvailabilityCalendar()}
             </>
           )}
 

@@ -1,7 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import FileUploadWidget from '../components/FileUploadWidget';
-import AvailabilityCalendarForm from '../components/AvailabilityCalendarForm';
 import '../styles/PromoterDashboard.css';
 
 const blankOfferForm = {
@@ -416,10 +415,6 @@ function PromoterDashboard() {
     setForm({ ...form, videos: [...form.videos, fileUrl] });
   };
 
-  const handleAvailabilityCalendarChange = (periods) => {
-    setForm({ ...form, availabilityCalendar: periods });
-  };
-
   const resetForm = () => {
     setForm(blankOfferForm);
     setCreateStep(1);
@@ -448,21 +443,6 @@ function PromoterDashboard() {
       }
       return null;
     }
-    // Validation spéciale pour courte_duree/location
-    if (form.mainCategory === 'location' && form.subCategory === 'courte_duree') {
-      if (!form.description || !form.address || !form.propertyType || !form.equipment || !Array.isArray(form.availabilityCalendar) || form.availabilityCalendar.length === 0) {
-        return "Veuillez renseigner l'adresse, la description, le type de bien, les équipements et le calendrier.";
-      }
-      return null;
-    }
-
-    // Validation spéciale pour longue_duree/location
-    if (form.mainCategory === 'location' && form.subCategory === 'longue_duree') {
-      if (!form.description || !form.address || !form.propertyType || !form.advance) {
-        return "Veuillez renseigner la description, l'adresse, le type de bien et les avances demandées.";
-      }
-      return null;
-    }
     if (form.mainCategory !== 'promotion' && (!form.description || !form.address)) {
       return 'Veuillez renseigner la description et l’adresse.';
     }
@@ -474,14 +454,6 @@ function PromoterDashboard() {
       if (form.subCategory !== 'maison' && !form.area) return 'Veuillez renseigner la superficie.';
       if (form.subCategory === 'maison' && !form.propertyType) return 'Veuillez renseigner le type de maison.';
       if (form.subCategory === 'locaux_commerciaux' && !form.facadeCount) return 'Veuillez renseigner le nombre de façades.';
-    }
-    if (form.mainCategory === 'location') {
-      if (!form.subCategory) return 'Choisissez une sous-catégorie location.';
-      if (form.subCategory !== 'longue_duree' && form.subCategory !== 'courte_duree' && !form.area) return 'Veuillez renseigner la superficie.';
-      if (form.subCategory !== 'longue_duree' && !form.propertyType) return 'Veuillez renseigner le type de bien.';
-      if (form.subCategory === 'longue_duree' && !form.advance) return 'Veuillez indiquer les avances requises.';
-      if (form.subCategory === 'courte_duree' && !form.equipment) return 'Veuillez indiquer les équipements.';
-      if (form.subCategory === 'courte_duree' && (!Array.isArray(form.availabilityCalendar) || form.availabilityCalendar.length === 0)) return 'Veuillez renseigner le calendrier de réservation.';
     }
     if (form.mainCategory === 'promotion' && !form.paymentTerms) {
       return 'Veuillez renseigner le type de paiement pour la promotion.';
@@ -496,8 +468,6 @@ function PromoterDashboard() {
       (form.mainCategory === 'vente' && form.subCategory === 'terrain') ? `Terrain - ${form.address}` :
       (form.mainCategory === 'vente' && form.subCategory === 'maison') ? `Maison - ${form.address}` :
       (form.mainCategory === 'vente' && form.subCategory === 'locaux_commerciaux') ? `Locaux commerciaux - ${form.address}` :
-      (form.mainCategory === 'location' && form.subCategory === 'longue_duree') ? `Location - ${form.address}` :
-      (form.mainCategory === 'location' && form.subCategory === 'courte_duree') ? `Location courte durée - ${form.address}` :
       form.address || ''
     ),
     price: form.price ? Number(form.price) : undefined,
@@ -757,7 +727,6 @@ function PromoterDashboard() {
 
               {createStep === 1 && (
                 <div className="category-selection">
-                  <button className={`category-box ${form.mainCategory === 'location' ? 'active' : ''}`} type="button" onClick={() => selectCategory('location')}><h3>Location</h3><p>Location longue durée ou courte durée.</p></button>
                   <button className={`category-box ${form.mainCategory === 'vente' ? 'active' : ''}`} type="button" onClick={() => selectCategory('vente')}><h3>Vente particulier</h3><p>Terrain, maison ou locaux commerciaux.</p></button>
                   <button className={`category-box ${form.mainCategory === 'promotion' ? 'active' : ''}`} type="button" onClick={() => selectCategory('promotion')}><h3>Promotion</h3><p>Projets immobiliers sans sous-catégorie.</p></button>
                 </div>
@@ -768,13 +737,6 @@ function PromoterDashboard() {
                   <button className={`category-box ${form.subCategory === 'terrain' ? 'active' : ''}`} type="button" onClick={() => selectSubcategory('terrain')}><h3>Terrain</h3><p>Annonce terrain avec accès et viabilisation.</p></button>
                   <button className={`category-box ${form.subCategory === 'maison' ? 'active' : ''}`} type="button" onClick={() => selectSubcategory('maison')}><h3>Maison</h3><p>Maison ou villa avec finition.</p></button>
                   <button className={`category-box ${form.subCategory === 'locaux_commerciaux' ? 'active' : ''}`} type="button" onClick={() => selectSubcategory('locaux_commerciaux')}><h3>Locaux commerciaux</h3><p>Espace commercial avec façade.</p></button>
-                </div>
-              )}
-
-              {createStep === 2 && form.mainCategory === 'location' && (
-                <div className="category-selection">
-                  <button className={`category-box ${form.subCategory === 'longue_duree' ? 'active' : ''}`} type="button" onClick={() => selectSubcategory('longue_duree')}><h3>Longue durée</h3><p>Louer sur du long terme.</p></button>
-                  <button className={`category-box ${form.subCategory === 'courte_duree' ? 'active' : ''}`} type="button" onClick={() => selectSubcategory('courte_duree')}><h3>Courte durée</h3><p>Location saisonnière ou touristique.</p></button>
                 </div>
               )}
 
@@ -1058,138 +1020,6 @@ function PromoterDashboard() {
                         </div>
                       </div>
                     </>
-                  ) : form.mainCategory === 'location' && form.subCategory === 'longue_duree' ? (
-                    // Formulaire simplifié pour Location Longue Durée
-                    <>
-                      <div className="form-section">
-                        <h4>🏠 Description du bien en location</h4>
-                        <div className="form-group required">
-                          <label>Description complète *</label>
-                          <textarea
-                            rows="5"
-                            value={form.description}
-                            onChange={changeField('description')}
-                            placeholder="Décrivez le bien à louer : superficie, équipements, environnement, avantages..."
-                            required
-                          />
-                          <small>Minimum 50 caractères. Soyez descriptif et mettez en avant les atouts du bien.</small>
-                        </div>
-                      </div>
-
-                      <div className="form-section">
-                        <h4>📍 Localisation</h4>
-                        <div className="form-group required">
-                          <label>Adresse complète *</label>
-                          <input
-                            type="text"
-                            value={form.address}
-                            onChange={changeField('address')}
-                            placeholder="Ex: Rue de l'Indépendance, Béjaia"
-                            required
-                          />
-                          <small>Indiquez l'adresse exacte pour faciliter la localisation.</small>
-                        </div>
-                      </div>
-
-                      <div className="form-section">
-                        <h4>🏠 Caractéristiques du bien</h4>
-                        <div className="form-grid">
-                          <div className="form-group required">
-                            <label>Type de bien *</label>
-                            <textarea
-                              rows="2"
-                              value={form.propertyType}
-                              onChange={changeField('propertyType')}
-                              placeholder="Ex: Appartement T3, Duplex, Bureau à étage..."
-                              required
-                            />
-                            <small>Décrivez le type de bien (texte libre, retours à la ligne autorisés).</small>
-                          </div>
-                          <div className="form-group required">
-                            <label>Avances demandées *</label>
-                            <input
-                              type="text"
-                              value={form.advance}
-                              onChange={changeField('advance')}
-                              placeholder="Ex: 3 mois d'avance"
-                              required
-                            />
-                            <small>Précisez le montant des avances requises (ex: 3 mois, 6 mois).</small>
-                          </div>
-                        </div>
-                      </div>
-                    </>
-                  ) : form.mainCategory === 'location' && form.subCategory === 'courte_duree' ? (
-                    // Formulaire simplifié pour Location Courte Durée
-                    <>
-                      <div className="form-section">
-                        <h4>📍 Adresse</h4>
-                        <div className="form-group required">
-                          <label>Adresse complète *</label>
-                          <input
-                            type="text"
-                            value={form.address}
-                            onChange={changeField('address')}
-                            placeholder="Ex: Rue des Palmiers, Alger"
-                            required
-                          />
-                          <small>Indiquez l'adresse exacte ou le quartier.</small>
-                        </div>
-                      </div>
-
-                      <div className="form-section">
-                        <h4>📝 Description</h4>
-                        <div className="form-group required">
-                          <label>Description complète *</label>
-                          <textarea
-                            rows="5"
-                            value={form.description}
-                            onChange={changeField('description')}
-                            placeholder="Décrivez votre logement : type, équipements, quartier, avantages..."
-                            required
-                          />
-                          <small>Présentez clairement votre offre courte durée.</small>
-                        </div>
-                      </div>
-
-                      <div className="form-section">
-                        <h4>🏠 Type de bien</h4>
-                          <div className="form-group required">
-                            <label>Type de bien *</label>
-                            <textarea
-                              rows="2"
-                              value={form.propertyType}
-                              onChange={changeField('propertyType')}
-                              placeholder="Ex: Appartement meublé, Studio avec balcon, Villa 3 chambres"
-                              required
-                            />
-                            <small>Décrivez le type de bien (texte libre, retours à la ligne autorisés).</small>
-                          </div>
-                      </div>
-
-                      <div className="form-section">
-                        <h4>🛋️ Équipements</h4>
-                          <div className="form-group required">
-                            <label>Équipements *</label>
-                            <textarea
-                              rows="3"
-                              value={form.equipment}
-                              onChange={changeField('equipment')}
-                              placeholder="Ex: Wi-Fi\nClimatisation\nKitchenette\nMachine à laver"
-                              required
-                            />
-                            <small>Listez les équipements. Vous pouvez séparer par virgules ou sauts de ligne.</small>
-                          </div>
-                      </div>
-
-                      <div className="form-section">
-                        <AvailabilityCalendarForm
-                          value={form.availabilityCalendar}
-                          onChange={handleAvailabilityCalendarChange}
-                          disabled={false}
-                        />
-                      </div>
-                    </>
                   ) : (
                     // Formulaire complet pour les autres catégories
                     <>
@@ -1467,7 +1297,6 @@ function PromoterDashboard() {
                     <option value="all">Toutes catégories</option>
                     <option value="promotion">Promotion</option>
                     <option value="vente">Vente</option>
-                    <option value="location">Location</option>
                   </select>
                 </div>
                 <div className="filter-group search-group">

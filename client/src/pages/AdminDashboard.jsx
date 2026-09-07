@@ -846,7 +846,6 @@ function AdminDashboard() {
                         <select value={editedOffer?.mainCategory || ''} onChange={(e) => handleOfferFieldChange('mainCategory', e.target.value)}>
                           <option value="promotion">Promotion</option>
                           <option value="vente">Vente</option>
-                          <option value="location">Location</option>
                         </select>
                       </div>
                       <div className="detail-row"><span className="detail-label">Sous-catégorie</span>
@@ -855,8 +854,6 @@ function AdminDashboard() {
                           <option value="maison">Maison</option>
                           <option value="terrain">Terrain</option>
                           <option value="locaux_commerciaux">Locaux commerciaux</option>
-                          <option value="courte_duree">Courte durée</option>
-                          <option value="longue_duree">Longue durée</option>
                         </select>
                       </div>
                     </div>

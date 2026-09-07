@@ -74,7 +74,7 @@ async function seedData() {
       {
         user: adminUser._id,
         mainCategory: 'promotion',
-        subCategory: 'courte_duree',
+        subCategory: '',
         title: 'Immeuble de bureaux - Quartier financier',
         description: 'Immeuble neuf 8 étages avec 2 ascenseurs, parkings sous-terrain, espace restauration. Bâtiment classé HQE, certifié durable et écologique. Grandes baies vitrées avec vue panoramique.',
         address: 'Avenue Mohammed VI',
@@ -165,62 +165,6 @@ async function seedData() {
         videos: [
           'https://www.w3schools.com/html/mov_bbb.mp4'
         ],
-        status: 'approved',
-        isPublished: true
-      },
-      {
-        user: adminUser._id,
-        mainCategory: 'location',
-        subCategory: 'courte_duree',
-        title: 'Appartement meublé centre-ville Fès',
-        description: 'T3 confortable, entièrement équipé. Proche des commerces et attractions touristiques. Rues piétonnes célèbres à 2 min à pied.',
-        address: 'Rue des Almoravides',
-        city: 'Fès',
-        area: 85,
-        price: 1500,
-        paymentTerms: 'Par nuit',
-        apartmentTypes: ['T3 (3 pièces)'],
-        propertyType: 'Appartement',
-        elevator: false,
-        parking: true,
-        floor: 2,
-        projectStatus: 'conception',
-        finishingState: 'fini',
-        availability: 'immediatement',
-        equipment: ['wifi', 'climatisation', 'cuisine équipée', 'balcon', 'salle de bain privée', 'linge de lit'],
-        availabilityCalendar: [
-          { startDate: new Date('2026-04-15'), endDate: new Date('2026-04-20') },
-          { startDate: new Date('2026-04-22'), endDate: new Date('2026-05-05') },
-          { startDate: new Date('2026-05-10'), endDate: new Date('2026-06-30') }
-        ],
-        images: [
-          'https://via.placeholder.com/800x600?text=Appart+Salon',
-          'https://via.placeholder.com/800x600?text=Appart+Chambre'
-        ],
-        videos: [
-          'https://www.w3schools.com/html/mov_bbb.mp4'
-        ],
-        status: 'approved',
-        isPublished: true
-      },
-      {
-        user: adminUser._id,
-        mainCategory: 'location',
-        subCategory: 'longue_duree',
-        title: 'Studio étudiant - Agadir',
-        description: 'Petit studio moderne idéal pour étudiant. Meublé, internet inclus.',
-        address: 'Avenue Hassan II',
-        city: 'Agadir',
-        area: 35,
-        price: 2000,
-        paymentTerms: 'Par mois',
-        propertyType: 'Studio',
-        furnished: true,
-        advance: '3 mois de loyer',
-        elevator: true,
-        parking: false,
-        floor: 3,
-        images: ['https://via.placeholder.com/600x400?text=Studio+Agadir'],
         status: 'approved',
         isPublished: true
       },

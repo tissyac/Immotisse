@@ -5,13 +5,11 @@ const API_URL = import.meta.env.VITE_API_URL || window.location.origin;
 
 const categories = [
   { label: 'Vente', value: 'vente', icon: '🏠', color: '#f48500', description: 'Biens immobiliers à vendre' },
-  { label: 'Location', value: 'location', icon: '🏢', color: '#f48500', description: 'Locations immobilières' },
   { label: 'Promotion', value: 'promotion', icon: '🏗️', color: '#f48500', description: 'Promotions immobilières' }
 ];
 
 const categoryLabels = {
   vente: 'Vente',
-  location: 'Location',
   promotion: 'Promotion'
 };
 
@@ -24,7 +22,7 @@ const formatOfferImageUrl = (src) => {
 
 function Home() {
   const navigate = useNavigate();
-  const [counts, setCounts] = useState({ promotion: 0, vente: 0, location: 0 });
+  const [counts, setCounts] = useState({ promotion: 0, vente: 0 });
   const [recentOffers, setRecentOffers] = useState([]);
   const [loadingData, setLoadingData] = useState(true);
   const [error, setError] = useState('');
@@ -53,8 +51,7 @@ function Home() {
 
       setCounts({
         promotion: data.counts.promotion || 0,
-        vente: data.counts.vente || 0,
-        location: data.counts.location || 0
+        vente: data.counts.vente || 0
       });
       setRecentOffers(data.offers);
     } catch (err) {
@@ -103,7 +100,6 @@ function Home() {
                   onChange={(e) => setSearchFilters({...searchFilters, type: e.target.value})}
                 >
                   <option value="">Tous les types</option>
-                  <option value="location">Location</option>
                   <option value="vente">Vente particulier</option>
                   <option value="promotion">Promotion</option>
                 </select>

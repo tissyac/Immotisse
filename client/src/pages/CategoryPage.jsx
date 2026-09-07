@@ -6,8 +6,7 @@ const API_URL = import.meta.env.VITE_API_URL || window.location.origin;
 
 const categoryLabels = {
   promotion: 'Promotion',
-  vente: 'Vente Particulier',
-  location: 'Location'
+  vente: 'Vente Particulier'
 };
 
 const venteSubcategories = [
@@ -16,17 +15,10 @@ const venteSubcategories = [
   { value: 'locaux_commerciaux', label: 'Locaux commerciaux' }
 ];
 
-const locationSubcategories = [
-  { value: 'courte_duree', label: 'Courte durée' },
-  { value: 'longue_duree', label: 'Longue durée' }
-];
-
 const subcategoryLabels = {
   terrain: 'Terrain',
   maison: 'Maison',
-  locaux_commerciaux: 'Locaux commerciaux',
-  courte_duree: 'Courte durée',
-  longue_duree: 'Longue durée'
+  locaux_commerciaux: 'Locaux commerciaux'
 };
 
 const formatOfferImageUrl = (src) => {
@@ -59,7 +51,7 @@ function CategoryPage() {
       loadSearchResults(params);
     } else {
       setIsSearch(false);
-      if ((category === 'vente' || category === 'location') && !subcategory) {
+      if (category === 'vente' && !subcategory) {
         setOffers([]);
         setLoading(false);
         setError('');
@@ -101,7 +93,7 @@ function CategoryPage() {
     try {
       setLoading(true);
       setError('');
-      const subCategoryQuery = (category === 'vente' || category === 'location') && subcategory ? `&subCategory=${subcategory}` : '';
+      const subCategoryQuery = category === 'vente' && subcategory ? `&subCategory=${subcategory}` : '';
       const response = await fetch(
         `${API_URL}/offers?status=approved&mainCategory=${category}${subCategoryQuery}&limit=20`,
         { cache: 'no-store' }
@@ -136,32 +128,6 @@ function CategoryPage() {
             <div className="category-icon">🏠</div>
             <h3>{sub.label}</h3>
             <p>Voir toutes les offres {sub.label.toLowerCase()} à vendre.</p>
-            <div className="category-footer">
-              <span>Découvrir</span>
-              <span className="category-cta">Voir</span>
-            </div>
-          </Link>
-        ))}
-      </section>
-    </div>
-  );
-
-  const renderLocationSubcategories = () => (
-    <div>
-      <section className="section hero-section">
-        <h2>Location</h2>
-        <p>Choisis une durée de location pour voir toutes les offres disponibles.</p>
-        <Link className="back-link" to="/">
-          ← Retour aux catégories
-        </Link>
-      </section>
-
-      <section className="section categories-grid">
-        {locationSubcategories.map((sub) => (
-          <Link key={sub.value} to={`/category/location/${sub.value}`} className="category-card">
-            <div className="category-icon">🏢</div>
-            <h3>{sub.label}</h3>
-            <p>Voir toutes les offres en location {sub.label.toLowerCase()}.</p>
             <div className="category-footer">
               <span>Découvrir</span>
               <span className="category-cta">Voir</span>
@@ -232,8 +198,6 @@ function CategoryPage() {
         </>
       ) : category === 'vente' && !subcategory ? (
         renderVenteSubcategories()
-      ) : category === 'location' && !subcategory ? (
-        renderLocationSubcategories()
       ) : (
         <>
           <section className="section hero-section">
@@ -247,8 +211,8 @@ function CategoryPage() {
                 ? `Toutes les offres ${categoryLabels[category].toLowerCase()} disponibles.`
                 : 'Catégorie introuvable.'}
             </p>
-            <Link className="back-link" to={category === 'vente' ? '/category/vente' : category === 'location' ? '/category/location' : '/'}>
-              ← Retour {category === 'vente' ? 'aux sous-catégories de vente' : category === 'location' ? 'aux durées de location' : 'aux catégories'}
+            <Link className="back-link" to={category === 'vente' ? '/category/vente' : '/'}>
+              ← Retour {category === 'vente' ? 'aux sous-catégories de vente' : 'aux catégories'}
             </Link>
           </section>
 
@@ -319,7 +283,7 @@ function CategoryPage() {
                         )}
 
                         {(offer.mainCategory === 'vente' && (offer.subCategory === 'maison' || offer.subCategory === 'locaux_commerciaux')) ||
-                         (offer.mainCategory === 'location' && offer.subCategory === 'longue_duree') ? (
+                         (offer.mainCategory === 'vente' && (offer.subCategory === 'maison' || offer.subCategory === 'locaux_commerciaux')) ? (
                           <>
                             {offer.description && (
                               <div className="detail-item">
@@ -339,12 +303,6 @@ function CategoryPage() {
                                 <span className="detail-text">{offer.area} m²</span>
                               </div>
                             )}
-                            {offer.mainCategory === 'location' && offer.subCategory === 'longue_duree' && offer.advance && (
-                              <div className="detail-item">
-                                <span className="detail-icon">💰</span>
-                                <span className="detail-text">{offer.advance}</span>
-                              </div>
-                            )}
                           </>
                         ) : offer.mainCategory === 'vente' && offer.area ? (
                           <div className="detail-item">
@@ -353,12 +311,6 @@ function CategoryPage() {
                           </div>
                         ) : null}
 
-                        {offer.mainCategory === 'location' && offer.area && (
-                          <div className="detail-item">
-                            <span className="detail-icon">📐</span>
-                            <span className="detail-text">{offer.area} m²</span>
-                          </div>
-                        )}
                       </div>
                       <div className="offer-address">
                         <span className="location-icon">📍</span>
